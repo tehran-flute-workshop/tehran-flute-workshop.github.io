@@ -425,7 +425,8 @@ async function loadBooked(){
   try{
     const ctl=new AbortController();
     const t=setTimeout(()=>ctl.abort(),9000);
-    const res=await fetch(CONFIG.SHEET_URL, {signal:ctl.signal, redirect:'follow'});
+    const u = CONFIG.SHEET_URL + (CONFIG.SHEET_URL.indexOf('?')>=0?'&':'?') + 't=' + Date.now();
+    const res=await fetch(u, {signal:ctl.signal, redirect:'follow', cache:'no-store'});
     clearTimeout(t);
     const data=await res.json();
     if(data && data.ok && Array.isArray(data.booked)){
@@ -505,11 +506,24 @@ const slotsEl=document.getElementById('slots');
 function longDate(jy,jm,jd){
   return `${J_DOW[jDow(gDate(jy,jm,jd))]} ${fa(jd)} ${J_MONTHS[jm-1]} ${fa(jy)}`;
 }
-function pickDate(jy,jm,jd){
+async function pickDate(jy,jm,jd){
   selDate={jy,jm,jd}; selTime=null;
   formCard.classList.add('hidden');
   renderCal();
   document.getElementById('pickedDate').textContent = '📅 ' + longDate(jy,jm,jd);
+  renderSlots(jy,jm,jd);
+  timeCard.classList.remove('hidden');
+  timeCard.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  /* لیست نوبت‌های پر را تازه می‌کند — برای وقتی صفحه مدتی باز مانده */
+  if(CONFIG.SHEET_URL && await loadBooked()){
+    if(selDate && selDate.jy===jy && selDate.jm===jm && selDate.jd===jd && !selTime){
+      renderSlots(jy,jm,jd);
+      renderCal();
+    }
+  }
+}
+function renderSlots(jy,jm,jd){
   const groups = openGroups(jy,jm,jd);
   slotsEl.innerHTML='';
   if(!groups.length){
@@ -545,8 +559,6 @@ function pickDate(jy,jm,jd){
       slotsEl.appendChild(note);
     }
   }
-  timeCard.classList.remove('hidden');
-  timeCard.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 function pickTime(s, btn){
   selTime=s;
