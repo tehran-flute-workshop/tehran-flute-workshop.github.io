@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>دریافت وقت مراجعه — کارگاه فلوت تهران</title>
+<meta name="description" content="رزرو آنلاین وقت مراجعه — کارگاه فلوت تهران">
+<meta property="og:title" content="دریافت وقت مراجعه — کارگاه فلوت تهران">
+<meta property="og:description" content="تاریخ و ساعت دلخواهتان را انتخاب کنید">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+:root{
+  --bg:#f2f5f7; --card:#ffffff; --ink:#16232b; --muted:#6b7f8a;
+  --line:#e2e9ee; --accent:#0d9488; --accent-soft:#d9f2ef; --accent-ink:#065f5a;
+  --danger:#c2410c; --radius:16px;
+  --shadow:0 1px 2px rgba(16,40,52,.04),0 8px 28px rgba(16,40,52,.07);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e1519;--card:#16212a;--ink:#e8f0f4;--muted:#8da0ab;
+    --line:#25333e;--accent:#2dd4bf;--accent-soft:#123c3a;--accent-ink:#a7f3ec;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:Vazirmatn,'IRANSans','Segoe UI',Tahoma,system-ui,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75;
+  padding:18px 14px 48px; font-size:15px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:520px;margin:0 auto}
+header{text-align:center;margin-bottom:18px}
+header .kicker{font-size:13.5px;color:var(--muted);margin:0 0 3px}
+header h1{font-size:22px;font-weight:800;margin:0 0 7px;line-height:1.5}
+header p{margin:0;color:var(--muted);font-size:13.5px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.card.hidden{display:none}
+.rules.hidden{display:none}
+
+.step{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.step .num{width:24px;height:24px;flex:0 0 24px;border-radius:50%;background:var(--accent-soft);
+  color:var(--accent-ink);font-size:12.5px;font-weight:700;display:grid;place-items:center}
+.step h2{font-size:15px;font-weight:700;margin:0}
+
+.rules{background:var(--accent-soft);border-radius:var(--radius);padding:15px 16px;margin-bottom:14px}
+.rules h2{font-size:14.5px;font-weight:700;margin:0 0 9px;color:var(--accent-ink)}
+.rules ul{margin:0;padding:0;list-style:none}
+.rules li{font-size:13.5px;color:var(--accent-ink);padding:4px 0;display:flex;gap:8px;line-height:1.85}
+.rules li b{font-weight:700}
+.rules li::before{content:"—";opacity:.5;flex:0 0 auto}
+
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.calhead .title{font-weight:700;font-size:16px}
+.navbtn{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);
+  background:transparent;color:var(--ink);font-size:19px;cursor:pointer;line-height:1;
+  display:grid;place-items:center;transition:.15s}
+.navbtn:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent)}
+.navbtn:disabled{opacity:.3;cursor:not-allowed}
+
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.dow span{text-align:center;font-size:11.5px;color:var(--muted);font-weight:600;padding:4px 0}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.day{aspect-ratio:1/1;border:1px solid transparent;border-radius:11px;background:transparent;
+  color:var(--ink);font-family:inherit;font-size:15px;cursor:pointer;display:grid;place-items:center;
+  transition:.13s;padding:0}
+.day:hover:not(:disabled){background:var(--accent-soft)}
+.day:disabled{color:var(--muted);opacity:.3;cursor:not-allowed}
+.day.today{border-color:var(--accent);font-weight:700}
+.day.selected{background:var(--accent);color:#fff;font-weight:700;border-color:var(--accent)}
+.day.selected:hover{background:var(--accent)}
+.empty{aspect-ratio:1/1}
+
+.slotgroup{margin-bottom:13px}
+.slotgroup:last-child{margin-bottom:0}
+.slotgroup .glabel{font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:7px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px}
+.slot{padding:11px 4px;border:1px solid var(--line);border-radius:11px;background:transparent;
+  color:var(--ink);font-family:inherit;font-size:13.5px;cursor:pointer;transition:.13s;
+  font-variant-numeric:tabular-nums}
+.slot:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.slot.selected{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+.picked{font-size:13.5px;color:var(--accent-ink);background:var(--accent-soft);
+  padding:9px 12px;border-radius:10px;margin-bottom:13px;font-weight:600}
+.noslots{color:var(--muted);font-size:13.5px;text-align:center;padding:14px 0}
+
+label{display:block;font-size:13.5px;font-weight:600;margin:0 0 6px}
+label .opt{font-weight:400;color:var(--muted);font-size:12px}
+input:not([type=checkbox]),select,textarea{width:100%;padding:12px 13px;border:1px solid var(--line);
+  border-radius:11px;background:var(--bg);color:var(--ink);font-family:inherit;font-size:15px;
+  margin-bottom:13px;transition:.13s;appearance:none}
+input:not([type=checkbox]):focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-soft)}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:21px;height:21px;flex:0 0 21px;
+  margin:2px 0 0;padding:0;border:1.5px solid var(--muted);border-radius:6px;background:var(--card);
+  cursor:pointer;display:grid;place-items:center;transition:.13s}
+input[type=checkbox]:hover{border-color:var(--accent)}
+input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+input[type=checkbox]:checked::after{content:"✓";color:#fff;font-size:13px;font-weight:800;line-height:1}
+input[type=checkbox]:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+textarea{resize:vertical;min-height:70px}
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%236b7f8a' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:left 14px center}
+input[type=tel]{direction:ltr;text-align:right}
+input[type=checkbox].hp{position:absolute;left:-9999px;opacity:0;height:0;width:0;
+  border:none;background:none;margin:0;flex:0 0 0}
+.consent{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--ink);
+  margin:-2px 0 14px;line-height:1.8;cursor:pointer;user-select:none;padding:4px 0}
+.consent span{padding-top:1px}
+
+.submit{width:100%;padding:15px;border:none;border-radius:12px;background:var(--accent);
+  color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:.15s}
+.submit:hover:not(:disabled){filter:brightness(1.08)}
+.submit:disabled{opacity:.6;cursor:not-allowed}
+.err{color:var(--danger);font-size:13px;margin:-6px 0 12px;display:none}
+.err.show{display:block}
+
+.donewrap{text-align:center}
+.doneTop{margin-bottom:14px}
+.doneTop .tick{width:58px;height:58px;border-radius:50%;background:var(--accent-soft);
+  display:grid;place-items:center;margin:0 auto 12px;font-size:29px;color:var(--accent-ink)}
+.doneTop h2{margin:0;font-size:19px}
+
+#ticket{background:#ffffff;color:#16232b;border:1px solid #dfe7ec;border-radius:16px;
+  padding:20px 18px;text-align:right;margin:0 auto 14px;max-width:400px}
+#ticket .tHead{text-align:center;padding-bottom:13px;border-bottom:2px solid #0d9488}
+#ticket .tHead .tName{font-size:17px;font-weight:800;color:#065f5a;margin:0 0 3px}
+#ticket .tHead .tSub{font-size:12px;color:#6b7f8a;margin:0}
+#ticket .tRow{display:flex;justify-content:space-between;gap:14px;padding:7px 0;
+  border-bottom:1px dashed #eef3f6;font-size:13.5px}
+#ticket .tRow:last-of-type{border-bottom:none}
+#ticket .tRow .k{color:#6b7f8a;flex:0 0 auto}
+#ticket .tRow .v{font-weight:700;text-align:left}
+#ticket .tBig{background:#f4f8fa;border-radius:11px;padding:11px 13px;margin:14px 0 12px}
+#ticket .tBig .k{font-size:11.5px;color:#6b7f8a;margin-bottom:3px}
+#ticket .tBig .v{font-size:15.5px;font-weight:800;color:#065f5a}
+#ticket .tFoot{border-top:1px dashed #dfe7ec;margin-top:13px;padding-top:12px;font-size:12.5px;
+  color:#6b7f8a;line-height:2}
+#ticket .tFoot .fRow{display:flex;gap:7px}
+#ticket .tFoot .fRow b{color:#16232b;font-weight:700;flex:0 0 auto}
+
+.acts{display:flex;gap:9px;max-width:400px;margin:0 auto}
+.act{flex:1;padding:13px 8px;border-radius:12px;border:1px solid var(--line);background:transparent;
+  color:var(--ink);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+.act:hover{border-color:var(--accent);background:var(--accent-soft)}
+.act.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.act.primary:hover{filter:brightness(1.08)}
+
+@media print{
+  body{background:#fff;padding:0}
+  .card,.acts,.doneTop,.rules{display:none!important}
+  #doneCard{display:block!important;border:none;box-shadow:none;padding:0}
+  #ticket{border:1px solid #ccc;max-width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="kicker">دریافت وقت مراجعه</p>
+  <h1 id="bizName">کارگاه فلوت تهران</h1>
+  <p id="tagline">تاریخ و ساعت دلخواهتان را انتخاب کنید</p>
+</header>
+
+<div class="rules" id="rulesBox">
+  <h2>پیش از رزرو بخوانید</h2>
+  <ul id="rulesList"></ul>
+</div>
+
+<div class="card" id="calCard">
+  <div class="step"><div class="num">۱</div><h2>انتخاب تاریخ</h2></div>
+  <div class="calhead">
+    <button class="navbtn" id="prevBtn" aria-label="ماه قبل">›</button>
+    <div class="title" id="monthTitle"></div>
+    <button class="navbtn" id="nextBtn" aria-label="ماه بعد">‹</button>
+  </div>
+  <div class="dow">
+    <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="card hidden" id="timeCard">
+  <div class="step"><div class="num">۲</div><h2>انتخاب ساعت</h2></div>
+  <div class="picked" id="pickedDate"></div>
+  <div id="slots"></div>
+</div>
+
+<div class="card hidden" id="formCard">
+  <div class="step"><div class="num">۳</div><h2>مشخصات شما</h2></div>
+  <div class="picked" id="pickedFull"></div>
+  <form id="bookForm" novalidate>
+    <label for="name">نام و نام خانوادگی</label>
+    <input type="text" id="name" name="name" autocomplete="name" required>
+    <div class="err" id="errName">لطفاً نام و نام خانوادگی را وارد کنید.</div>
+
+    <label for="phone">شماره تماس</label>
+    <input type="tel" id="phone" name="phone" inputmode="numeric" autocomplete="tel" placeholder="09121234567" required>
+    <div class="err" id="errPhone">شماره موبایل معتبر نیست. (۱۱ رقم، با ۰۹ شروع شود)</div>
+
+    <label for="service">نوع ساز</label>
+    <select id="service" name="service" required></select>
+
+    <label for="notes">توضیحات <span class="opt">(اختیاری)</span></label>
+    <textarea id="notes" name="notes" rows="3" placeholder="مثلاً: مدل ساز، مشکلی که دارد…"></textarea>
+
+    <label class="consent" for="agree">
+      <input type="checkbox" id="agree">
+      <span>قوانین بالای صفحه را خوانده‌ام و می‌پذیرم.</span>
+    </label>
+    <div class="err" id="errAgree" style="margin-top:-8px">برای ادامه، پذیرش قوانین لازم است.</div>
+
+    <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+
+    <button type="submit" class="submit" id="submitBtn">ثبت نهایی وقت</button>
+    <div class="err" id="errSend"></div>
+  </form>
+</div>
+
+<div class="card hidden" id="doneCard">
+  <div class="donewrap">
+    <div class="doneTop">
+      <div class="tick">✓</div>
+      <h2>وقت شما ثبت شد</h2>
+    </div>
+
+    <div id="ticket">
+      <div class="tHead">
+        <p class="tName" id="tkName">کارگاه فلوت تهران</p>
+        <p class="tSub">برگهٔ وقت مراجعه</p>
+      </div>
+
+      <div class="tBig">
+        <div class="k">تاریخ و ساعت مراجعه</div>
+        <div class="v" id="tkWhen">—</div>
+      </div>
+
+      <div class="tRow"><span class="k">نام مراجعه‌کننده</span><span class="v" id="tkPerson">—</span></div>
+      <div class="tRow"><span class="k">نوع ساز</span><span class="v" id="tkInst">—</span></div>
+      <div class="tRow"><span class="k">شمارهٔ تماس شما</span><span class="v" id="tkPhone">—</span></div>
+      <div class="tRow"><span class="k">زمان ثبت</span><span class="v" id="tkStamp">—</span></div>
+
+      <div class="tFoot">
+        <div class="fRow"><b>نشانی:</b><span id="tkAddr">—</span></div>
+        <div class="fRow" id="tkMapRow"><b>موقعیت روی نقشه:</b><a id="tkMap" href="#" target="_blank" rel="noopener" style="direction:ltr;color:#0d9488;font-weight:700;text-decoration:none">—</a></div>
+        <div class="fRow"><b>تماس کارگاه:</b><span id="tkTel" style="direction:ltr">—</span></div>
+      </div>
+    </div>
+
+    <div class="acts">
+      <button class="act primary" id="saveImg">📷 ذخیرهٔ تصویر</button>
+      <button class="act" id="printBtn">🖨 چاپ / PDF</button>
+    </div>
+    <div class="acts" style="margin-top:9px">
+      <a class="act" id="mapBtn" href="#" target="_blank" rel="noopener"
+         style="text-decoration:none;display:grid;place-items:center">🗺 مسیریابی روی نقشه</a>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ⚙️  تنظیمات — CONFIG
+   ═══════════════════════════════════════════════════════════ */
+const CONFIG = {
+
+  // ①  آدرس اسکریپت گوگل — قفل نوبت‌ها + ثبت در شیت + ارسال ایمیل
+  //     اگر روزی دوباره Deploy کردید و آدرس عوض شد، فقط این خط را به‌روز کنید
+  SHEET_URL: "https://script.google.com/macros/s/AKfycbz67d5msHYgCquB0qyMU30T76NQXreDkc6t4ulkMLdwEZOHT9evqEdrGeU554Oj3uayIA/exec",
+
+  BUSINESS_NAME: "کارگاه فلوت تهران",
+  KICKER: "دریافت وقت مراجعه",
+  TAGLINE: "تاریخ و ساعت دلخواهتان را انتخاب کنید",
+
+  ADDRESS: "تهران، میدان فردوسی، خیابان انقلاب، خیابان براتی، کوچهٔ تمدن، پلاک ۲۹، زنگ اول",
+  PHONE:   "09124036151",
+  MAP_URL: "https://maps.app.goo.gl/nEDaDVNmeQxmW4xM8",
+
+  // ②  بازهٔ باز بودن رزرو (تاریخ شمسی)
+  OPEN_FROM: {jy:1405, jm:6, jd:27},   // ۲۷ شهریور ۱۴۰۵
+  OPEN_TO:   {jy:1405, jm:7, jd:22},   // ۲۲ مهر ۱۴۰۵
+
+  // ③  مدت هر نوبت (دقیقه)
+  SLOT_MINUTES: 30,
+
+  // ④  ساعات کاری بر اساس روز هفته
+  //     ۰=شنبه ۱=یکشنبه ۲=دوشنبه ۳=سه‌شنبه ۴=چهارشنبه ۵=پنج‌شنبه ۶=جمعه
+  //     [] یعنی آن روز تعطیل است
+  HOURS: {
+    0: [["10:00","13:00"], ["16:00","19:00"]],   // شنبه
+    1: [["10:00","13:00"], ["16:00","19:00"]],   // یکشنبه
+    2: [["10:00","13:00"], ["16:00","19:00"]],   // دوشنبه
+    3: [["10:00","13:00"], ["16:00","19:00"]],   // سه‌شنبه
+    4: [["10:00","14:00"]],                      // چهارشنبه
+    5: [],                                       // پنج‌شنبه — تعطیل
+    6: []                                        // جمعه — تعطیل
+  },
+
+  // ⑤  استثنا: روزهایی که ساعتشان با قانون بالا فرق دارد
+  //     کلید: تاریخ شمسی "سال-ماه-روز" بدون صفر اول
+  OVERRIDES: {
+    "1405-6-27": [["10:00","13:00"], ["16:00","19:00"]]   // جمعهٔ ۲۷ شهریور — روز افتتاح
+  },
+
+  // ⑥  انواع ساز
+  SERVICES: ["فلوت", "کلارینت", "اُبوآ"],
+
+  // ⑦  دستورالعمل بالای صفحه
+  RULES: [
+    "برای هر ساز فقط <b>یک وقت</b> رزرو کنید. رزروهای تکراری حذف می‌شوند.",
+    "هر وقت مراجعه <b>۳۰ دقیقه</b> است. لطفاً ۵ دقیقه زودتر برسید.",
+    "وقت شما پس از <b>تماس تأیید</b> از طرف کارگاه قطعی می‌شود.",
+    "برای لغو یا تغییر، حداقل <b>۲۴ ساعت قبل</b> تماس بگیرید.",
+    "ساز خود را همراه بیاورید و در صورت امکان مشکل آن را در توضیحات بنویسید.",
+    "پس از ثبت، <b>برگهٔ وقت</b> نمایش داده می‌شود؛ آن را ذخیره کنید."
+  ],
+
+  // ⑧  ساعت‌های رزروشده — کلید: تاریخ شمسی، "all" یعنی کل روز بسته
+  //     مثال:  "1405-6-28": ["10:00", "16:30"],
+  BLOCKED: {}
+};
+/* ═══════════ پایان تنظیمات ═══════════ */
+
+
+/* ---------- Jalali ↔ Gregorian ---------- */
+function div(a,b){return ~~(a/b)}
+function mod(a,b){return a-~~(a/b)*b}
+function jalCal(jy){
+  const breaks=[-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
+  const bl=breaks.length, gy=jy+621; let leapJ=-14, jp=breaks[0], jm, jump, leap, n, i;
+  if(jy<jp||jy>=breaks[bl-1]) throw new Error('bad jalali year');
+  for(i=1;i<bl;i++){ jm=breaks[i]; jump=jm-jp; if(jy<jm) break;
+    leapJ=leapJ+div(jump,33)*8+div(mod(jump,33),4); jp=jm; }
+  n=jy-jp;
+  leapJ=leapJ+div(n,33)*8+div(mod(n,33)+3,4);
+  if(mod(jump,33)===4 && jump-n===4) leapJ++;
+  const leapG=div(gy,4)-div((div(gy,100)+1)*3,4)-150;
+  const march=20+leapJ-leapG;
+  if(jump-n<6) n=n-jump+div(jump+4,33)*33;
+  leap=mod(mod(n+1,33)-1,4); if(leap===-1) leap=4;
+  return {leap,gy,march};
+}
+function g2d(gy,gm,gd){
+  let d=div((gy+div(gm-8,6)+100100)*1461,4)+div(153*mod(gm+9,12)+2,5)+gd-34840408;
+  return d-div(div(gy+100100+div(gm-8,6),100)*3,4)+752;
+}
+function d2g(jdn){
+  let j=4*jdn+139361631;
+  j=j+div(div(4*jdn+183187720,146097)*3,4)*4-3908;
+  const i=div(mod(j,1461),4)*5+308;
+  const gd=div(mod(i,153),5)+1, gm=mod(div(i,153),12)+1, gy=div(j,1461)-100100+div(8-gm,6);
+  return {gy,gm,gd};
+}
+function j2d(jy,jm,jd){ const r=jalCal(jy); return g2d(r.gy,3,r.march)+(jm-1)*31-div(jm,7)*(jm-7)+jd-1 }
+function d2j(jdn){
+  const gy0=d2g(jdn).gy; let jy=gy0-621; const r=jalCal(jy);
+  const jdn1f=g2d(gy0,3,r.march); let k=jdn-jdn1f, jm, jd;
+  if(k>=0){ if(k<=185){ return {jy, jm:1+div(k,31), jd:mod(k,31)+1}; } k-=186; }
+  else { jy--; k+=179; if(r.leap===1) k++; }
+  jm=7+div(k,30); jd=mod(k,30)+1;
+  return {jy,jm,jd};
+}
+const toJalali=(gy,gm,gd)=>d2j(g2d(gy,gm,gd));
+const toGregorian=(jy,jm,jd)=>d2g(j2d(jy,jm,jd));
+const isLeapJ=jy=>jalCal(jy).leap===0;
+const jMonthLen=(jy,jm)=> jm<=6?31 : (jm<=11?30 : (isLeapJ(jy)?30:29));
+
+/* ---------- helpers ---------- */
+const FA='۰۱۲۳۴۵۶۷۸۹';
+const fa = s => String(s).replace(/\d/g,d=>FA[+d]);
+const enDigits = s => String(s).replace(/[۰-۹]/g,d=>FA.indexOf(d))
+                               .replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+const J_MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const J_DOW=['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه'];
+const jDow = date => (date.getDay()+1)%7;
+const key = (jy,jm,jd) => `${jy}-${jm}-${jd}`;
+const pad = n => String(n).padStart(2,'0');
+const hm2min = s => { const [h,m]=s.split(':').map(Number); return h*60+m };
+const min2hm = m => `${pad(Math.floor(m/60))}:${pad(m%60)}`;
+const gDate = (jy,jm,jd) => { const g=toGregorian(jy,jm,jd); return new Date(g.gy,g.gm-1,g.gd) };
+
+/* ---------- window bounds ---------- */
+const FROM_JDN = j2d(CONFIG.OPEN_FROM.jy, CONFIG.OPEN_FROM.jm, CONFIG.OPEN_FROM.jd);
+const TO_JDN   = j2d(CONFIG.OPEN_TO.jy,   CONFIG.OPEN_TO.jm,   CONFIG.OPEN_TO.jd);
+
+const today = new Date(); today.setHours(0,0,0,0);
+const tJ = toJalali(today.getFullYear(), today.getMonth()+1, today.getDate());
+const TODAY_JDN = j2d(tJ.jy, tJ.jm, tJ.jd);
+
+let viewY, viewM;
+if(TODAY_JDN < FROM_JDN){ viewY=CONFIG.OPEN_FROM.jy; viewM=CONFIG.OPEN_FROM.jm; }
+else if(TODAY_JDN > TO_JDN){ viewY=CONFIG.OPEN_TO.jy; viewM=CONFIG.OPEN_TO.jm; }
+else { viewY=tJ.jy; viewM=tJ.jm; }
+let selDate=null, selTime=null;
+
+/* ---------- schedule engine ---------- */
+function rangesFor(jy,jm,jd){
+  const ov = CONFIG.OVERRIDES[key(jy,jm,jd)];
+  if(ov) return ov;
+  return CONFIG.HOURS[jDow(gDate(jy,jm,jd))] || [];
+}
+function slotsInRange(from,to){
+  const out=[]; const a=hm2min(from), b=hm2min(to);
+  for(let m=a; m+CONFIG.SLOT_MINUTES<=b; m+=CONFIG.SLOT_MINUTES) out.push(min2hm(m));
+  return out;
+}
+function blockedFor(jy,jm,jd){
+  const b = CONFIG.BLOCKED[key(jy,jm,jd)];
+  if(b==='all') return '*';
+  return Array.isArray(b) ? b.map(x=>x.trim()) : [];
+}
+
+/* نوبت‌هایی که از روی گوگل شیت پر شده‌اند */
+let BOOKED = new Set();
+async function loadBooked(){
+  if(!CONFIG.SHEET_URL) return false;
+  try{
+    const ctl=new AbortController();
+    const t=setTimeout(()=>ctl.abort(),9000);
+    const res=await fetch(CONFIG.SHEET_URL, {signal:ctl.signal, redirect:'follow'});
+    clearTimeout(t);
+    const data=await res.json();
+    if(data && data.ok && Array.isArray(data.booked)){
+      BOOKED = new Set(data.booked.map(x=>String(x).trim()));
+      return true;
+    }
+  }catch(err){ /* اگر شیت در دسترس نبود، صفحه بدون قفل کار می‌کند */ }
+  return false;
+}
+/* returns [{label, slots:[...]}, ...] with unavailable slots already removed */
+function openGroups(jy,jm,jd){
+  const jdn = j2d(jy,jm,jd);
+  if(jdn < FROM_JDN || jdn > TO_JDN) return [];
+  const blocked = blockedFor(jy,jm,jd);
+  if(blocked==='*') return [];
+  const isToday = jdn===TODAY_JDN;
+  const now=new Date(); const nowM = now.getHours()*60+now.getMinutes();
+  const dk = key(jy,jm,jd);
+  const groups=[];
+  for(const [from,to] of rangesFor(jy,jm,jd)){
+    const slots = slotsInRange(from,to).filter(s=>{
+      if(blocked.includes(s)) return false;
+      if(BOOKED.has(dk+'|'+s)) return false;
+      if(isToday && hm2min(s) <= nowM) return false;
+      return true;
+    });
+    if(slots.length) groups.push({label:`${fa(from)} تا ${fa(to)}`, slots});
+  }
+  return groups;
+}
+function dayAvailable(jy,jm,jd){
+  return openGroups(jy,jm,jd).some(g=>g.slots.length>0);
+}
+function slotRange(s){
+  const a=hm2min(s), b=a+CONFIG.SLOT_MINUTES;
+  return {from:min2hm(a), to:min2hm(b)};
+}
+
+/* ---------- calendar ---------- */
+const gridEl=document.getElementById('grid');
+const titleEl=document.getElementById('monthTitle');
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+
+function renderCal(){
+  titleEl.textContent = `${J_MONTHS[viewM-1]} ${fa(viewY)}`;
+  gridEl.innerHTML='';
+  const firstCol = jDow(gDate(viewY, viewM, 1));
+  for(let i=0;i<firstCol;i++){
+    const e=document.createElement('div'); e.className='empty'; gridEl.appendChild(e);
+  }
+  const len = jMonthLen(viewY, viewM);
+  for(let d=1; d<=len; d++){
+    const btn=document.createElement('button');
+    btn.type='button'; btn.className='day'; btn.textContent=fa(d);
+    const ok = dayAvailable(viewY, viewM, d);
+    btn.disabled = !ok;
+    if(viewY===tJ.jy && viewM===tJ.jm && d===tJ.jd) btn.classList.add('today');
+    if(selDate && selDate.jy===viewY && selDate.jm===viewM && selDate.jd===d) btn.classList.add('selected');
+    if(ok) btn.addEventListener('click',()=>pickDate(viewY,viewM,d));
+    btn.setAttribute('aria-label', `${d} ${J_MONTHS[viewM-1]} ${viewY}`);
+    gridEl.appendChild(btn);
+  }
+  const pm=(()=>{ let y=viewY,m=viewM-1; if(m<1){m=12;y--} return {y,m} })();
+  prevBtn.disabled = j2d(pm.y, pm.m, jMonthLen(pm.y,pm.m)) < FROM_JDN;
+  const nm=(()=>{ let y=viewY,m=viewM+1; if(m>12){m=1;y++} return {y,m} })();
+  nextBtn.disabled = j2d(nm.y, nm.m, 1) > TO_JDN;
+}
+prevBtn.onclick=()=>{ viewM--; if(viewM<1){viewM=12;viewY--} renderCal() };
+nextBtn.onclick=()=>{ viewM++; if(viewM>12){viewM=1;viewY++} renderCal() };
+
+/* ---------- selection ---------- */
+const timeCard=document.getElementById('timeCard');
+const formCard=document.getElementById('formCard');
+const slotsEl=document.getElementById('slots');
+
+function longDate(jy,jm,jd){
+  return `${J_DOW[jDow(gDate(jy,jm,jd))]} ${fa(jd)} ${J_MONTHS[jm-1]} ${fa(jy)}`;
+}
+function pickDate(jy,jm,jd){
+  selDate={jy,jm,jd}; selTime=null;
+  formCard.classList.add('hidden');
+  renderCal();
+  document.getElementById('pickedDate').textContent = '📅 ' + longDate(jy,jm,jd);
+  const groups = openGroups(jy,jm,jd);
+  slotsEl.innerHTML='';
+  if(!groups.length){
+    slotsEl.innerHTML='<div class="noslots">برای این روز ساعت خالی وجود ندارد.</div>';
+  } else {
+    groups.forEach(gr=>{
+      const wrap=document.createElement('div'); wrap.className='slotgroup';
+      if(groups.length>1){
+        const lb=document.createElement('div'); lb.className='glabel'; lb.textContent=gr.label;
+        wrap.appendChild(lb);
+      }
+      const row=document.createElement('div'); row.className='slots';
+      gr.slots.forEach(s=>{
+        const b=document.createElement('button');
+        b.type='button'; b.className='slot';
+        const r=slotRange(s);
+        b.textContent=`${fa(r.from)} – ${fa(r.to)}`;
+        b.onclick=()=>pickTime(s,b);
+        row.appendChild(b);
+      });
+      wrap.appendChild(row); slotsEl.appendChild(wrap);
+    });
+  }
+  timeCard.classList.remove('hidden');
+  timeCard.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function pickTime(s, btn){
+  selTime=s;
+  slotsEl.querySelectorAll('.slot').forEach(c=>c.classList.remove('selected'));
+  btn.classList.add('selected');
+  const r=slotRange(s);
+  document.getElementById('pickedFull').textContent =
+    `📅 ${longDate(selDate.jy,selDate.jm,selDate.jd)} — 🕗 ${fa(r.from)} تا ${fa(r.to)}`;
+  formCard.classList.remove('hidden');
+  formCard.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+/* ---------- init ---------- */
+document.getElementById('bizName').textContent=CONFIG.BUSINESS_NAME;
+document.querySelector('header .kicker').textContent=CONFIG.KICKER;
+document.getElementById('tagline').textContent=CONFIG.TAGLINE;
+document.getElementById('tkName').textContent=CONFIG.BUSINESS_NAME;
+document.getElementById('tkAddr').textContent=CONFIG.ADDRESS;
+document.getElementById('tkTel').textContent=fa(CONFIG.PHONE);
+if(CONFIG.MAP_URL){
+  const mapEl=document.getElementById('tkMap');
+  mapEl.href=CONFIG.MAP_URL;
+  mapEl.textContent=CONFIG.MAP_URL.replace(/^https?:\/\//,'');
+  document.getElementById('mapBtn').href=CONFIG.MAP_URL;
+}else{
+  document.getElementById('tkMapRow').style.display='none';
+  document.getElementById('mapBtn').parentElement.style.display='none';
+}
+document.title=`${CONFIG.KICKER} — ${CONFIG.BUSINESS_NAME}`;
+document.getElementById('rulesList').innerHTML =
+  CONFIG.RULES.map(r=>`<li><span>${r}</span></li>`).join('');
+const svcEl=document.getElementById('service');
+CONFIG.SERVICES.forEach(s=>{
+  const o=document.createElement('option'); o.value=s; o.textContent=s; svcEl.appendChild(o);
+});
+
+
+/* ---------- submit ---------- */
+const form=document.getElementById('bookForm');
+const submitBtn=document.getElementById('submitBtn');
+const show=(id,on)=>document.getElementById(id).classList.toggle('show',on);
+document.getElementById('agree').addEventListener('change',e=>{
+  if(e.target.checked) show('errAgree',false);
+});
+
+form.addEventListener('submit', async e=>{
+  e.preventDefault();
+  show('errSend',false);
+  const name=document.getElementById('name').value.trim();
+  let phone=enDigits(document.getElementById('phone').value).replace(/[\s\-()]/g,'');
+  if(phone.startsWith('+98')) phone='0'+phone.slice(3);
+  if(phone.startsWith('0098')) phone='0'+phone.slice(4);
+  if(/^9\d{9}$/.test(phone)) phone='0'+phone;
+
+  const okName=name.length>=3, okPhone=/^09\d{9}$/.test(phone);
+  const okAgree=document.getElementById('agree').checked;
+  show('errName',!okName); show('errPhone',!okPhone); show('errAgree',!okAgree);
+  if(!okName||!okPhone||!okAgree||!selDate||!selTime) return;
+
+  const r=slotRange(selTime);
+  const g=toGregorian(selDate.jy,selDate.jm,selDate.jd);
+  const shamsi=`${selDate.jy}/${pad(selDate.jm)}/${pad(selDate.jd)}`;
+  const greg=`${g.gy}-${pad(g.gm)}-${pad(g.gd)}`;
+  const dowName=J_DOW[jDow(gDate(selDate.jy,selDate.jm,selDate.jd))];
+  const instrument=svcEl.value;
+  const nd=new Date();
+  const nowJ=toJalali(nd.getFullYear(), nd.getMonth()+1, nd.getDate());
+  const stamp=`${nowJ.jy}/${pad(nowJ.jm)}/${pad(nowJ.jd)} - ${pad(nd.getHours())}:${pad(nd.getMinutes())}`;
+
+  const dk=key(selDate.jy,selDate.jm,selDate.jd);
+  const notes=document.getElementById('notes').value.trim();
+
+  submitBtn.disabled=true; submitBtn.textContent='در حال ثبت…';
+  try{
+    /* ── ۱) ثبت در گوگل شیت — این مرجع نهایی است و جلوی رزرو تکراری را می‌گیرد ── */
+    if(CONFIG.SHEET_URL){
+      let sres;
+      try{
+        const ctl=new AbortController();
+        const t=setTimeout(()=>ctl.abort(),20000);
+        sres = await fetch(CONFIG.SHEET_URL,{
+          method:'POST',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          redirect:'follow',
+          body: JSON.stringify({
+            dateKey: dk,
+            time: r.from,
+            dateText: `${dowName} ${selDate.jd} ${J_MONTHS[selDate.jm-1]} ${selDate.jy}`,
+            timeText: `${r.from} تا ${r.to}`,
+            name, phone, instrument,
+            notes: notes || '—',
+            gregorian: greg,
+            stamp
+          })
+        });
+        clearTimeout(t);
+      }catch(netErr){
+        throw new Error('ارتباط با سرور برقرار نشد. اینترنت را بررسی کنید و دوباره تلاش کنید.');
+      }
+      const sdata = await sres.json().catch(()=>null);
+      if(!sdata || !sdata.ok){
+        if(sdata && sdata.error==='taken'){
+          BOOKED.add(dk+'|'+r.from);
+          selTime=null;
+          pickDate(selDate.jy,selDate.jm,selDate.jd);
+          throw new Error('این نوبت همین حالا توسط فرد دیگری گرفته شد. لطفاً ساعت دیگری انتخاب کنید.');
+        }
+        if(sdata && sdata.error==='busy'){
+          throw new Error('سرور شلوغ است. چند لحظه بعد دوباره بزنید.');
+        }
+        throw new Error('ثبت در سرور انجام نشد. دوباره تلاش کنید.');
+      }
+      BOOKED.add(dk+'|'+r.from);
+    }
+
+    if(!CONFIG.SHEET_URL) await new Promise(x=>setTimeout(x,350));
+
+    document.getElementById('tkWhen').textContent=
+      `${longDate(selDate.jy,selDate.jm,selDate.jd)} — ساعت ${fa(r.from)} تا ${fa(r.to)}`;
+    document.getElementById('tkPerson').textContent=name;
+    document.getElementById('tkInst').textContent=instrument;
+    document.getElementById('tkPhone').textContent=fa(phone);
+    document.getElementById('tkStamp').textContent=fa(stamp);
+    window.__tkFile = `نوبت-${name}-${shamsi.replace(/\//g,'-')}`;
+
+    document.getElementById('rulesBox').classList.add('hidden');
+    document.getElementById('calCard').classList.add('hidden');
+    timeCard.classList.add('hidden');
+    formCard.classList.add('hidden');
+    document.getElementById('doneCard').classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){
+    const el=document.getElementById('errSend');
+    el.textContent='ثبت انجام نشد — '+(err.message||'خطای نامشخص');
+    el.classList.add('show');
+    submitBtn.disabled=false; submitBtn.textContent='ثبت نهایی وقت';
+  }
+});
+
+/* ---------- save / print ---------- */
+document.getElementById('printBtn').onclick=()=>window.print();
+document.getElementById('saveImg').onclick=async ()=>{
+  const btn=document.getElementById('saveImg');
+  if(typeof html2canvas!=='function'){ window.print(); return; }
+  const old=btn.textContent; btn.textContent='در حال ساخت…'; btn.disabled=true;
+  try{
+    const canvas=await html2canvas(document.getElementById('ticket'),
+      {backgroundColor:'#ffffff', scale:Math.min(3, (window.devicePixelRatio||1)*2)});
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download=(window.__tkFile||'نوبت')+'.png';
+    document.body.appendChild(a); a.click(); a.remove();
+  }catch(e){ window.print(); }
+  btn.textContent=old; btn.disabled=false;
+};
+
+/* ---------- start ---------- */
+renderCal();
+(async ()=>{
+  if(await loadBooked()) renderCal();
+})();
+</script>
+</body>
+</html>
