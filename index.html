@@ -80,7 +80,10 @@ header p{margin:0;color:var(--muted);font-size:13.5px}
   color:var(--ink);font-family:inherit;font-size:13.5px;cursor:pointer;transition:.13s;
   font-variant-numeric:tabular-nums}
 .slot:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.slot:disabled{opacity:.38;cursor:not-allowed;text-decoration:line-through;
+  background:var(--bg);border-style:dashed}
 .slot.selected{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+.takennote{font-size:12px;color:var(--muted);margin-top:11px;text-align:center}
 .picked{font-size:13.5px;color:var(--accent-ink);background:var(--accent-soft);
   padding:9px 12px;border-radius:10px;margin-bottom:13px;font-weight:600}
 .noslots{color:var(--muted);font-size:13.5px;text-align:center;padding:14px 0}
@@ -443,18 +446,18 @@ function openGroups(jy,jm,jd){
   const dk = key(jy,jm,jd);
   const groups=[];
   for(const [from,to] of rangesFor(jy,jm,jd)){
-    const slots = slotsInRange(from,to).filter(s=>{
-      if(blocked.includes(s)) return false;
-      if(BOOKED.has(dk+'|'+s)) return false;
-      if(isToday && hm2min(s) <= nowM) return false;
-      return true;
-    });
+    const slots=[];
+    for(const s of slotsInRange(from,to)){
+      if(isToday && hm2min(s) <= nowM) continue;               // ساعت گذشته — اصلاً نشان داده نشود
+      const taken = blocked.includes(s) || BOOKED.has(dk+'|'+s);
+      slots.push({t:s, taken:taken});                          // رزروشده نمایش داده می‌شود ولی خاموش
+    }
     if(slots.length) groups.push({label:`${fa(from)} تا ${fa(to)}`, slots});
   }
   return groups;
 }
 function dayAvailable(jy,jm,jd){
-  return openGroups(jy,jm,jd).some(g=>g.slots.length>0);
+  return openGroups(jy,jm,jd).some(g=>g.slots.some(s=>!s.taken));
 }
 function slotRange(s){
   const a=hm2min(s), b=a+CONFIG.SLOT_MINUTES;
@@ -519,16 +522,28 @@ function pickDate(jy,jm,jd){
         wrap.appendChild(lb);
       }
       const row=document.createElement('div'); row.className='slots';
-      gr.slots.forEach(s=>{
+      gr.slots.forEach(o=>{
         const b=document.createElement('button');
         b.type='button'; b.className='slot';
-        const r=slotRange(s);
+        const r=slotRange(o.t);
         b.textContent=`${fa(r.from)} – ${fa(r.to)}`;
-        b.onclick=()=>pickTime(s,b);
+        if(o.taken){
+          b.disabled=true;
+          b.setAttribute('aria-label','رزرو شده');
+          b.title='این ساعت قبلاً رزرو شده است';
+        } else {
+          b.onclick=()=>pickTime(o.t,b);
+        }
         row.appendChild(b);
       });
       wrap.appendChild(row); slotsEl.appendChild(wrap);
     });
+    if(groups.some(g=>g.slots.some(s=>s.taken))){
+      const note=document.createElement('div');
+      note.className='takennote';
+      note.textContent='ساعت‌های کم‌رنگ قبلاً رزرو شده‌اند.';
+      slotsEl.appendChild(note);
+    }
   }
   timeCard.classList.remove('hidden');
   timeCard.scrollIntoView({behavior:'smooth', block:'nearest'});
